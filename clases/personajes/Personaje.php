@@ -26,6 +26,11 @@ abstract class Personaje {
     protected $poderAtaque;     // Multiplicador de daño base
     protected $poderDefensa;    // Reducción porcentual de daño recibido
     
+    // Sistema de niveles
+    protected $nivel = 1;       // Nivel actual del personaje
+    protected $experiencia = 0; // Experiencia actual
+    protected $expSiguienteNivel = 100; // Experiencia para subir al siguiente nivel
+    
     // Colección de habilidades aprendidas (array asociativo)
     protected $habilidades = []; // ['nombreHabilidad' => objetoHabilidad]
 
@@ -183,6 +188,9 @@ abstract class Personaje {
     public function getEstadisticas() {
         return [
             'nombre' => $this->nombre,
+            'nivel' => $this->nivel,
+            'experiencia' => $this->experiencia,
+            'expSiguienteNivel' => $this->expSiguienteNivel,
             'vidaActual' => $this->vidaActual,
             'vidaMaxima' => $this->vidaMaxima,
             'manaActual' => $this->manaActual,
@@ -218,6 +226,72 @@ abstract class Personaje {
      */
     public function getManaActual() {
         return $this->manaActual;
+    }
+    
+    /**
+     * Añade experiencia al personaje y comprueba si sube de nivel
+     * 
+     * @param int $cantidad Cantidad de experiencia a añadir
+     * @return string Mensaje describiendo el resultado
+     */
+    public function ganarExperiencia($cantidad) {
+        $this->experiencia += $cantidad;
+        $mensaje = "{$this->nombre} ganó {$cantidad} de experiencia.";
+        
+        // Comprobar si el personaje sube de nivel
+        if ($this->experiencia >= $this->expSiguienteNivel) {
+            $mensaje .= "\n" . $this->subirNivel();
+        }
+        
+        return $mensaje;
+    }
+    
+    /**
+     * Sube de nivel al personaje y mejora sus estadísticas
+     * 
+     * @return string Mensaje describiendo el resultado
+     */
+    protected function subirNivel() {
+        $this->nivel++;
+        
+        // Calcular experiencia para el siguiente nivel (aumenta con cada nivel)
+        $this->experiencia -= $this->expSiguienteNivel;
+        $this->expSiguienteNivel = round($this->expSiguienteNivel * 1.5);
+        
+        // Mejorar estadísticas base (cada clase puede sobrescribir este método)
+        $aumentoVida = round($this->vidaMaxima * 0.1); // +10% de vida máxima
+        $aumentoMana = round($this->manaMaximo * 0.1); // +10% de mana máximo
+        
+        $this->vidaMaxima += $aumentoVida;
+        $this->manaMaximo += $aumentoMana;
+        
+        // Recuperar vida y mana al subir de nivel
+        $this->vidaActual = $this->vidaMaxima;
+        $this->manaActual = $this->manaMaximo;
+        
+        // Pequeña mejora en daño y defensa
+        $this->poderAtaque *= 1.05; // +5% de poder de ataque
+        $this->poderDefensa *= 1.05; // +5% de poder de defensa
+        
+        return "¡{$this->nombre} subió a nivel {$this->nivel}!";
+    }
+    
+    /**
+     * Devuelve el nivel actual del personaje
+     * 
+     * @return int Nivel actual
+     */
+    public function getNivel() {
+        return $this->nivel;
+    }
+    
+    /**
+     * Devuelve la experiencia actual del personaje
+     * 
+     * @return int Experiencia actual
+     */
+    public function getExperiencia() {
+        return $this->experiencia;
     }
 }
 ?>
