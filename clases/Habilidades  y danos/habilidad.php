@@ -80,11 +80,11 @@ abstract class Habilidades {
      */
     public function getInfo() {
         return [
-            'nombre' => $this->nombre,
-            'descripcion' => $this->descripcion,
-            'coste' => $this->coste,
-            'dañoBase' => $this->dañoBase,
-            'tipoDaño' => $this->tipoDaño
+            'nombre' => getNombre(),
+            'descripcion' => getDescripcion(),
+            'coste' => getCoste(),
+            'dañoBase' => getDañoBase(),
+            'tipoDaño' => getTipoDaño()
         ];
     }
 }
